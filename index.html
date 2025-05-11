@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <title>Страшные сказки - интерактивный подсчет</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <link href="./assets/fontawesome/css/all.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gabriela&display=swap" rel="stylesheet">
+  <script defer src="script.js"></script>
+</head>
+
+<body>
+
+  <main>
+    <div class="container">
+      <div id="savedGame" style="display:none"></div>
+
+
+      <div class="playersCountContainer">
+        <span>Выберите количество игроков:</span>
+        <input type="button" class="playersCount" value="2">
+        <input type="button" class="playersCount" value="3">
+        <input type="button" class="playersCount active" value="4">
+      </div>
+
+      <div class="playersIconsColours"></div>
+
+      <div class="gameArea" style="display:none">
+        <div id="scoreBoard"></div>
+      </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay hidden">
+      <div id="modalBox" class="modal-box">
+        <div id="modalMessage" class="modal-message"></div>
+        <div id="modalInputContainer" class="hidden">
+          <input type="text" id="modalInput" />
+        </div>
+        <div class="modal-buttons">
+          <button id="modalOk">Ок</button>
+          <button id="modalCancel" class="hidden">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</body>
+
+</html>

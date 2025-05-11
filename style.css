@@ -1,0 +1,205 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color: white;
+  margin: 0;
+  background: url(./assets/f-70.jpg) repeat #303641;
+  text-align: center;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-size: 14px;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+main {
+  margin: 50px 0;
+  background: #171717;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+input[type="button"],
+button {
+  background: #f69a73;
+  color: white;
+  font-size: 15px;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: none;
+  margin: 10px;
+  font-family: "Gabriela", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+input[type="button"]:hover,
+input[type="button"].active,
+button:hover,
+button.active {
+  background: #a05e42;
+}
+
+input[type="button"]:hover,
+button:hover {
+  cursor: pointer;
+}
+
+input[type="button"].active,
+button.active {
+  background: #a05e42;
+}
+
+#savedGame {
+  margin: 15px 0;
+  border-radius: 20px;
+  background: #6f4b3b;
+  border-bottom: 4px solid #4d3328;
+  padding: 5px 0;
+  display: none;
+}
+
+.player-setup {
+  margin: 15px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background: #2a2a2a;
+}
+
+.color-options {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.color-circle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin: 0 5px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.color-circle.selected {
+  border-color: white;
+}
+
+.icon-options i {
+  font-size: 24px;
+  margin: 5px;
+  cursor: pointer;
+  color: #999;
+}
+
+.icon-options i.selected {
+  color: white;
+}
+
+.btn-next {
+  margin-top: 20px;
+}
+
+.player-bar {
+  text-align: left;
+  margin: 20px 0;
+}
+
+.bar-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.bar {
+  display: inline-block;
+  height: 24px;
+  padding: 0 2px;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  line-height: 23px;
+  text-align: center;
+  min-width: 13px;
+}
+
+.icon {
+  display: inline-block;
+  margin-left: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #171717;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 90%;
+  width: 360px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  text-align: center;
+  font-family: 'Gabriela', serif;
+}
+
+.modal-message {
+  margin-bottom: 10px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+#modalInput {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+#playerSelect {
+  padding: 5px;
+  background: #fff;
+  border: none;
+  border-radius: 5px;
+  margin-left: 5px;
+}
+
+#historyTable table {
+  margin: 0 auto;
+}
+
+#historyTable table td {
+  padding: 5px 20px;
+}
