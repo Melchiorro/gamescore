@@ -370,7 +370,7 @@ async function promptPointsEntry(manual = false) {
     if (selectedIndex === null) return;
 
     const selectedPlayer = players[selectedIndex];
-    const points = await customPrompt(`Введите очки для ${selectedPlayer.name}`, "0");
+    const points = await customPrompt(`Введите очки для ${selectedPlayer.name}`, "");
     if (points !== null) {
       const num = parseInt(points);
       if (!isNaN(num)) {
@@ -381,7 +381,7 @@ async function promptPointsEntry(manual = false) {
     }
   } else {
     for (let player of players) {
-      const points = await customPrompt(`Ход № ${currentRound}: ${player.name}, введите очки`, "0");
+      const points = await customPrompt(`Ход № ${currentRound}: ${player.name}, введите очки`, "");
       if (points !== null) {
         const num = parseInt(points);
         if (!isNaN(num)) {
