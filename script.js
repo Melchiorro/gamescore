@@ -257,9 +257,11 @@ function restartGameWithSamePlayers() {
 function renderScoreBoard() {
   const board = document.getElementById('scoreBoard');
   board.innerHTML = '';
-  const maxPoints = Math.max(...players.map(p => p.points), 1);
+  
+  const sortedPlayers = [...players].sort((a, b) => b.points - a.points);
+  const maxPoints = Math.max(...sortedPlayers.map(p => p.points), 1);
 
-  players.forEach(player => {
+  sortedPlayers.forEach(player => {
     const bar = document.createElement('div');
     bar.className = 'player-bar';
     const barWidth = (player.points / maxPoints) * 100;
