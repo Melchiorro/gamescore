@@ -187,8 +187,11 @@ async function confirmEndGame() {
   if (result === 'restart') {
     restartGameWithSamePlayers();
   } else if (result === 'end') {
-    const saves = getSavedGames().filter(save => !save.isCurrent);
-    localStorage.setItem(savedGamesKey, JSON.stringify(saves));
+    const saves = getSavedGames();
+    const updatedSaves = saves.map(game => 
+      game.id === currentGameId ? {...game, finished: true} : game
+    );
+    localStorage.setItem(savedGamesKey, JSON.stringify(updatedSaves));
     location.reload();
   }
 }
@@ -393,23 +396,34 @@ async function promptPointsEntry(manual = false) {
 
 function saveGame() {
   const savedGames = getSavedGames();
-  const existingIndex = savedGames.findIndex(g => g.id === currentGameId);
-
-  const newSave = {
-    id: currentGameId || Date.now(),
-    date: Date.now(),
-    players,
-    round: currentRound,
-    finished: false,
-  };
-
-  if (existingIndex !== -1) {
-    savedGames[existingIndex] = newSave;
-  } else {
-    savedGames.push(newSave);
-    currentGameId = newSave.id;
+  
+  if (currentGameId) {
+    const existingIndex = savedGames.findIndex(g => g.id === currentGameId);
+    if (existingIndex !== -1) {
+      savedGames[existingIndex] = {
+        id: currentGameId,
+        date: Date.now(),
+        players: JSON.parse(JSON.stringify(players)),
+        round: currentRound,
+        showScoreTable: showScoreTable,
+        finished: false
+      };
+      localStorage.setItem(savedGamesKey, JSON.stringify(savedGames));
+      return;
+    }
   }
-
+  
+  const newSave = {
+    id: Date.now(),
+    date: Date.now(),
+    players: JSON.parse(JSON.stringify(players)),
+    round: currentRound,
+    showScoreTable: showScoreTable,
+    finished: false
+  };
+  
+  currentGameId = newSave.id;
+  savedGames.push(newSave);
   localStorage.setItem(savedGamesKey, JSON.stringify(savedGames));
 }
 
@@ -423,16 +437,10 @@ function getSavedGames() {
 
 function loadGame(save) {
   players = save.players;
-  currentRound = save.currentRound;
+  currentRound = save.round || 1;
   showScoreTable = save.showScoreTable;
-
-  currentGameId = save.id; // сохранить ID загруженной игры
-
-  const saves = getSavedGames().map(s => ({
-    ...s,
-    isCurrent: s.id === save.id
-  }));
-  localStorage.setItem(savedGamesKey, JSON.stringify(saves));
+  
+  currentGameId = save.id;
 
   initGameField();
 }
