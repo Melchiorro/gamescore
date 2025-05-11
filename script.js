@@ -392,22 +392,27 @@ async function promptPointsEntry(manual = false) {
 
 
 function saveGame() {
-  const saves = getSavedGames();
-  const now = currentGameId || new Date().toISOString();
+  const savedGames = getSavedGames();
+  const existingIndex = savedGames.findIndex(g => g.id === currentGameId);
 
-  const current = {
-    id: now,
-    date: new Date().toISOString(),
+  const newSave = {
+    id: currentGameId || Date.now(),
+    date: Date.now(),
     players,
-    currentRound,
-    showScoreTable,
-    isCurrent: true,
-    finished: false
+    round: currentRound,
+    finished: false,
   };
 
-  const updated = [current, ...saves.filter(s => s.id !== now)];
-  localStorage.setItem(savedGamesKey, JSON.stringify(updated));
+  if (existingIndex !== -1) {
+    savedGames[existingIndex] = newSave;
+  } else {
+    savedGames.push(newSave);
+    currentGameId = newSave.id;
+  }
+
+  localStorage.setItem(savedGamesKey, JSON.stringify(savedGames));
 }
+
 
 
 
