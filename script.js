@@ -465,107 +465,125 @@ function renderHistoryTable() {
 }
 
 async function promptPointsEntry(manual = false) {
-    if (manual) {
-        const playerOptions = players.map((p, i) =>
-            `<option value="${i}">${escapeHTML(p.name)}</option>`
-        ).join('');
-
-        const selectHtml = `
+  if (manual) {
+    const playerOptions = players.map((p, i) => 
+      `<option value="${i}">${escapeHTML(p.name)}</option>`
+    ).join('');
+    
+    const selectHtml = `
       <label>Выберите игрока:</label>
       <select id="playerSelect">${playerOptions}</select>
     `;
 
-        const selectedIndex = await new Promise(resolve => {
-            const overlay = document.getElementById('modalOverlay');
-            const box = document.getElementById('modalBox');
-            const messageDiv = document.getElementById('modalMessage');
-            const inputContainer = document.getElementById('modalInputContainer');
-            const inputField = document.getElementById('modalInput');
-            const okBtn = document.getElementById('modalOk');
-            const cancelBtn = document.getElementById('modalCancel');
+    const selectedIndex = await new Promise(resolve => {
+      const overlay = document.getElementById('modalOverlay');
+      const box = document.getElementById('modalBox');
+      const messageDiv = document.getElementById('modalMessage');
+      const inputContainer = document.getElementById('modalInputContainer');
+      const inputField = document.getElementById('modalInput');
+      const okBtn = document.getElementById('modalOk');
+      const cancelBtn = document.getElementById('modalCancel');
 
-            messageDiv.innerHTML = selectHtml;
-            inputContainer.classList.add('hidden');
-            overlay.classList.remove('hidden');
-            cancelBtn.classList.remove('hidden');
+      messageDiv.innerHTML = selectHtml;
+      inputContainer.classList.add('hidden');
+      overlay.classList.remove('hidden');
+      cancelBtn.classList.remove('hidden');
 
-            okBtn.textContent = 'ОК';
-            cancelBtn.textContent = 'Отмена';
+      okBtn.textContent = 'ОК';
+      cancelBtn.textContent = 'Отмена';
 
-            const cleanup = () => {
-                overlay.classList.add('hidden');
-                okBtn.onclick = null;
-                cancelBtn.onclick = null;
-            };
+      const cleanup = () => {
+        overlay.classList.add('hidden');
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+      };
 
-            okBtn.onclick = () => {
-                const sel = document.getElementById('playerSelect');
-                cleanup();
-                resolve(parseInt(sel.value));
-            };
+      okBtn.onclick = () => {
+        const sel = document.getElementById('playerSelect');
+        cleanup();
+        resolve(parseInt(sel.value));
+      };
 
-            cancelBtn.onclick = () => {
-                cleanup();
-                resolve(null);
-            };
-        });
+      cancelBtn.onclick = () => {
+        cleanup();
+        resolve(null);
+      };
+    });
 
-        if (selectedIndex === null) return;
+    if (selectedIndex === null) return;
 
-        const selectedPlayer = players[selectedIndex];
-        let points;
-        let isValid = false;
-
-        do {
-            points = await customPrompt(`Введите очки для ${selectedPlayer.name}`, "");
-            if (points === null) return; // Пользователь отменил
-
-            const validation = validatePointsInput(points, true); // Разрешаем отрицательные
-            if (validation.valid) {
-                selectedPlayer.points += validation.value;
-                selectedPlayer.history.push({ round: 'ручной ввод', delta: validation.value });
-                renderScoreBoard();
-                isValid = true;
-            } else {
-                await customAlert(validation.error);
-            }
-        } while (!isValid);
-
-    } else {
-        let roundCompleted = true;
-
-        for (let i = 0; i < players.length; i++) {
-            const player = players[i];
-            let points;
-            let isValid = false;
-
-            do {
-                points = await customPrompt(`Ход № ${currentRound}: ${player.name}, введите очки`, "");
-                if (points === null) {
-                    // Пользователь отменил ввод для этого игрока
-                    roundCompleted = false;
-                    await customAlert(`Ввод очков для ${player.name} отменен. Раунд не завершен.`);
-                    break;
-                }
-
-                const validation = validatePointsInput(points, true);
-                if (validation.valid) {
-                    player.points += validation.value;
-                    player.history.push({ round: currentRound, delta: validation.value });
-                    isValid = true;
-                } else {
-                    await customAlert(validation.error);
-                }
-            } while (!isValid);
-
-            if (!roundCompleted) break;
-        }
-
-        if (roundCompleted) {
-            currentRound++;
-        }
+    const selectedPlayer = players[selectedIndex];
+    let points;
+    let isValid = false;
+    
+    do {
+      points = await customPrompt(`Введите очки для ${selectedPlayer.name}`, "");
+      if (points === null) return; // Пользователь отменил
+      
+      const validation = validatePointsInput(points, true);
+      if (validation.valid) {
+        selectedPlayer.points += validation.value;
+        selectedPlayer.history.push({ round: 'ручной ввод', delta: validation.value });
         renderScoreBoard();
+        isValid = true;
+      } else {
+        await customAlert(validation.error);
+      }
+    } while (!isValid);
+    
+  } else {
+    // Сохраняем начальные очки для возможного отката
+    const initialPoints = players.map(p => ({...p}));
+    let roundCancelled = false;
+    
+    for (let i = 0; i < players.length; i++) {
+      const player = players[i];
+      let points;
+      let isValid = false;
+      let inputCancelled = false;
+      
+      do {
+        points = await customPrompt(`Ход № ${currentRound}: ${player.name}, введите очки`, "");
+        if (points === null) {
+          // Пользователь отменил ввод для этого игрока
+          inputCancelled = true;
+          roundCancelled = true;
+          break;
+        }
+        
+        const validation = validatePointsInput(points, true);
+        if (validation.valid) {
+          player.points += validation.value;
+          player.history.push({ round: currentRound, delta: validation.value });
+          isValid = true;
+        } else {
+          await customAlert(validation.error);
+        }
+      } while (!isValid);
+      
+      if (inputCancelled) {
+        // Откатываем изменения для всех игроков этого раунда
+        for (let j = 0; j <= i; j++) {
+          // Восстанавливаем исходные данные из копии
+          const originalPlayer = initialPoints.find(p => p.name === players[j].name);
+          if (originalPlayer) {
+            players[j].points = originalPlayer.points;
+            // Удаляем запись этого раунда из истории
+            players[j].history = players[j].history.filter(h => h.round !== currentRound);
+          }
+        }
+        
+        await customAlert(`Ввод очков отменен. Изменения раунда ${currentRound} отменены.`);
+        renderScoreBoard();
+        break;
+      }
     }
+    
+    if (!roundCancelled) {
+      currentRound++;
+      renderScoreBoard();
+    }
+  }
 }
 
 function saveGame() {
